@@ -1,3 +1,11 @@
+# timesheets
+
+| Date    | Time | What did I do                                              |
+| :------:|:----:| :----------------------------------------------------------|
+| 26.5.21 | 0.5  | Setting up project to github                               |
+| total   | 0.5  |                                                            |
+
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
