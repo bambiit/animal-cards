@@ -4,7 +4,7 @@
 | :------:|:----:| :----------------------------------------------------------|
 | 26.5.21 | 0.5  | Setting up project to github                               |
 | 28.5.21 | 2.0  | Setting Material UI for frontend framework, layout header                               |
-| total   | 0.5  |                                                            |
+| total   | 2.5  |                                                            |
 
 
 # Getting Started with Create React App
