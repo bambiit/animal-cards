@@ -1,25 +1,8 @@
 body {
-  background: #d2e69c; 
+  background: #d2e69c;
 }
 
 #root {
   margin: 50px;
   padding: 50px;
-}
-
-p, a, span {
-  color: #4b778d;
-}
-
-.MuiButton-outlined {
-  border-color: #4b778d;
-}
-
-img.logo {
-  width: 100%;
-}
-
-p.title {
-  font-family: 'Indie Flower', cursive;
-  font-size: 70px;
 }

@@ -18,5 +18,14 @@ module.exports = {
     'react',
   ],
   'rules': {
+    'object-curly-spacing': ["always"],
+    "comma-dangle": ["error", {
+      "arrays": "never",
+      "objects": "never",
+      "imports": "never",
+      "exports": "never",
+      "functions": "never"
+    }],
+    "max-len": 120
   },
 };
