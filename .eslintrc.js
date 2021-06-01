@@ -1,31 +1,32 @@
 module.exports = {
   'env': {
     'browser': true,
-    'es2021': true,
+    'es2021': true
   },
   'extends': [
     'plugin:react/recommended',
-    'google',
+    'google'
   ],
   'parserOptions': {
     'ecmaFeatures': {
-      'jsx': true,
+      'jsx': true
     },
     'ecmaVersion': 12,
-    'sourceType': 'module',
+    'sourceType': 'module'
   },
   'plugins': [
-    'react',
+    'react'
   ],
   'rules': {
-    'object-curly-spacing': ["always"],
-    "comma-dangle": ["error", {
-      "arrays": "never",
-      "objects": "never",
-      "imports": "never",
-      "exports": "never",
-      "functions": "never"
+    'object-curly-spacing': 0,
+    'comma-dangle': ['error', {
+      'arrays': 'never',
+      'objects': 'never',
+      'imports': 'never',
+      'exports': 'never',
+      'functions': 'never'
     }],
-    "max-len": 120
-  },
+    'max-len': 0,
+    'indent': ['error', 2]
+  }
 };

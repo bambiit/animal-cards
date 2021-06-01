@@ -1,7 +1,7 @@
 import React from 'react';
 import {
   Grid, CardActionArea, CardMedia,
-  CardContent, Typography,
+  CardContent, Typography
 } from '@material-ui/core';
 import PropTypes from 'prop-types';
 import makeStyles from '@material-ui/core/styles/makeStyles';
@@ -9,21 +9,21 @@ import makeStyles from '@material-ui/core/styles/makeStyles';
 const useStyles = makeStyles({
   image: {
     height: '300px',
-    borderRadius: '15px 15px 0 0',
+    borderRadius: '15px 15px 0 0'
   },
   card: {
     background: '#fff',
-    borderRadius: 15,
+    borderRadius: 15
   },
   cardTypo: {
     color: '#4b778d',
-    fontFamily: '"Tajawal", sans-serif',
+    fontFamily: '"Tajawal", sans-serif'
   },
   cardTypoTitle: {
     color: '#4b778d',
     fontFamily: '"Tajawal", sans-serif',
-    fontWeight: 400,
-  },
+    fontWeight: 400
+  }
 });
 
 const AnimalCard = ({ xs }) => {
@@ -57,7 +57,7 @@ const AnimalCard = ({ xs }) => {
 };
 
 AnimalCard.propTypes = {
-  xs: PropTypes.number.isRequired,
+  xs: PropTypes.number.isRequired
 };
 
 export default AnimalCard;

@@ -3,6 +3,14 @@ body {
 }
 
 #root {
-  margin: 50px;
-  padding: 50px;
+  margin: 20px 50px 20px 50px;
+  padding: 20px 50px 20px 50px;
+}
+
+p,
+span,
+div,
+a {
+  color: #4b778d;
+  font-family: "Tajawal", sans-serif;
 }
