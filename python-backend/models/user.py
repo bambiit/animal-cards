@@ -1,9 +1,7 @@
-from pymodm import MongoModel, fields
+from models.mongo_model import MongoModel
 
 
 class User(MongoModel):
-    username: fields.CharField(primary_key=True, required=True)
-    email: fields.EmailField(unique=True, required=True)
-    first_name: fields.CharField()
-    last_name: fields.CharField()
-    hashed_password: fields.CharField()
+    def __init__(self):
+        super(User, self).__init__()
+        self.collection = 'users'

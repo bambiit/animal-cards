@@ -1,0 +1,25 @@
+version: "3"
+services:
+  animal-cards-backend:
+    env_file:
+      - ./configuration/.env.dev
+    image: animal-cards-backend
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - .:/www/api/animalcards/
+    depends_on:
+      - animal-cards-mongodb
+    ports:
+      - 8080:8080
+
+  animal-cards-mongodb:
+    image: mongo:3.6.18
+    restart: always
+    volumes:
+      - ./data/docker-entrypoint-initdb.d/:/docker-entrypoint-initdb.d/:ro
+    env_file:
+      - ./configuration/.env.dev
+    ports:
+      - 27017:27017
