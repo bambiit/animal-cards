@@ -12,4 +12,4 @@ COPY ./requirements.txt requirements.txt
 
 RUN pip3 install -r requirements.txt
 
-CMD [ "uwsgi", "--ini --log-master", "app.ini" ]
+CMD [ "uwsgi", "--ini", "app.ini" ]
