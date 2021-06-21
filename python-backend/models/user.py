@@ -1,21 +1,22 @@
-from models.mongo_model import MongoModel
 import bcrypt
+import logging
+import os
+from helpers.jwt import Jwt
+from models.mongo_model import MongoModel
 from pymongo.errors import DuplicateKeyError, CursorNotFound
 from pymongo.collection import ReturnDocument
-import logging
-import jwt
-import os
+from bson.objectid import ObjectId
+from models.user_type import UserType
 
 
 class User(MongoModel):
 
-    JWT_HASHING_ALGORITHM = 'HS256'
     PWD_ENCODING = 'UTF-8'
 
     def __init__(self):
-        super(User, self).__init__()
-        self.collection = 'users'
-        # if the index already exists, starting from version 3.11, mongo would ignore and not throw an exception
+        super(User, self).__init__('users')
+
+        # if the index already exists, starting from version 3.11, mongo w∏ould ignore and not throw an exception
         self.database[self.collection].create_index(
             'email', unique=True)
         self.database[self.collection].create_index(
@@ -25,27 +26,33 @@ class User(MongoModel):
 
         # username, email and password are required
         if not user['username'] or not user['email'] or not user['password']:
-            raise Exception('Required information is missing')
+            raise KeyError('Required information is missing')
+
+        if not user['role']:
+            role = 'user'
+        else:
+            role = user['role']
 
         try:
             hashed_password = bcrypt.hashpw(
                 bytes(user['password'], encoding=self.PWD_ENCODING), bcrypt.gensalt(os.environ['PWD_ROUNDS']))
 
-            added_user = self.database[self.collection].insert({
+            added_user = self.database[self.collection].insert_one({
                 'username': user['username'],
                 'password': hashed_password,
                 'first_name': user['first_name'],
                 'last_name': user['last_name'],
-                'email': user['email']
+                'email': user['email'],
+                'role': role
             })
 
             return added_user
         except DuplicateKeyError as error:
-            logging.error(str(error))
-            raise DuplicateKeyError(error)
+            logging.exception('Violation in user uniqueness constraints')
+            return None
         except Exception as error:
-            logging.error(str(error))
-            raise Exception(error)
+            logging.exception('Could not register new user')
+            return None
 
     def find_with_username(self, username):
         try:
@@ -53,49 +60,45 @@ class User(MongoModel):
                 'username': username})
             return user
         except CursorNotFound as error:
-            logging.error(str(error))
-            raise CursorNotFound(error)
+            logging.exception(
+                'No user is found with username as %s' % username)
+            return None
         except Exception as error:
-            logging.error(str(error))
-            raise Exception(error)
+            logging.exception(
+                'There has been an error during looking for user with username as %s' % username)
+            return None
 
-    def verify_password(self, username, id, password, db_password):
-        try:
-            if bcrypt.checkpw(bytes(password, encoding=self.PWD_ENCODING), db_password):
-                encoded_jwt = jwt.encode({
-                    'username': username,
-                    'id': str(id)
-                }, os.environ['JWT_SECRET'], algorithm=self.JWT_HASHING_ALGORITHM)
-                return encoded_jwt
-            else:
-                return ''
-        except jwt.InvalidIssuedAtError as error:
-            logging.error(str(error))
-            raise Exception(error)
+    def verify_password(self, user, password):
+        if bcrypt.checkpw(bytes(password, encoding=self.PWD_ENCODING), user['password']):
+            return Jwt.encode_token(user['username'], user['id'], user['role'])
+        return None
 
-    def delete(self, username):
-        try:
-            self.database[self.collection].find_one_and_delete(
-                {'username': username})
-            return True
-        except Exception as error:
-            logging.error(str(error))
-            raise False
+    def delete(self, user_id, token):
+        if Jwt.verify_user_permission(token) != UserType.ADMIN:
+            logging.exception('Not permitted to delete user')
+            return False
 
-    def update(self, username, update_user):
-        try:
-            self.database[self.collection].find_one_and_update(
-                {'username': username}, {'$set': {'username': update_user['username'], 'password': update_user['password'], 'first_name': update_user['first_name'], 'last_name': update_user['last_name']}}, return_document=ReturnDocument.AFTER)
-            return True
-        except Exception as error:
-            logging.error(str(error))
-            raise False
+        self.database[self.collection].find_one_and_delete(
+            {'_id': ObjectId(user_id)})
+        return True
 
-    def getAll(self):
-        try:
+    def change_password(self, user_id, token, new_password):
+        if Jwt.verify_user_permission(token, user_id) == UserType.NOT_ALLOWED_USER:
+            logging.exception(
+                'Not permitted to change password for user id %s' % user_id)
+            return False
+
+        hashed_password = bcrypt.hashpw(
+            bytes(new_password, encoding=self.PWD_ENCODING), bcrypt.gensalt(os.environ['PWD_ROUNDS']))
+
+        self.database[self.collection].find_one_and_update(
+            {'_id': ObjectId(user_id)}, {'$set': {'password': hashed_password}}, return_document=ReturnDocument.AFTER)
+        return True
+
+    def getAll(self, token):
+        if Jwt.verify_user_permission(token) == UserType.ADMIN:
             users = self.database[self.collection].find(
-                {}, {'_id': 0, 'password': 0})
+                {}, {'password': 0})
             return users
-        except Exception as error:
-            logging.error(str(error))
-            raise False
+
+        return None
