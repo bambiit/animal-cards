@@ -15,7 +15,7 @@ services:
       - 8080:8080
 
   animal-cards-mongodb:
-    image: mongo:3.6.18
+    image: mongo:4.4
     restart: always
     volumes:
       - ./data/docker-entrypoint-initdb.d/:/docker-entrypoint-initdb.d/:ro
