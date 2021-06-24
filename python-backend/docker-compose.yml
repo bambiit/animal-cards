@@ -2,7 +2,9 @@ version: "3"
 services:
   animal-cards-backend:
     env_file:
-      - ./configuration/.env.dev
+      - ./configuration/.env
+    environment: 
+      MONGO_INITDB_DATABASE: ${MONGO_INITDB_DATABASE}
     image: animal-cards-backend
     build:
       context: .
@@ -15,11 +17,13 @@ services:
       - 8080:8080
 
   animal-cards-mongodb:
-    image: mongo:4.4
+    image: mongo:3.6.18
     restart: always
     volumes:
       - ./data/docker-entrypoint-initdb.d/:/docker-entrypoint-initdb.d/:ro
-    env_file:
-      - ./configuration/.env.dev
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
+      MONGO_INITDB_DATABASE: ${MONGO_INITDB_DATABASE}
     ports:
       - 27017:27017

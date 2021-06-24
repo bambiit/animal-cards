@@ -2,6 +2,7 @@ from models.mongo_model import MongoModel
 from bson.objectid import ObjectId
 from models.user_type import UserType
 from helpers.jwt import Jwt
+from pymongo.collection import ReturnDocument
 
 import logging
 
@@ -12,7 +13,7 @@ class Card(MongoModel):
         super(Card, self).__init__('cards')
         self.database[self.collection].create_index('title', unique=True)
 
-    def add(self, card, token):
+    def add_card(self, card, token):
         try:
             author = Jwt.get_user_id(token)
             if card['author']:
@@ -53,11 +54,26 @@ class Card(MongoModel):
         if not card_id:
             return False
 
-        card = self.database[self.collection].find_one({'_id': ObjectId(card_id)})
+        card = self.database[self.collection].find_one(
+            {'_id': ObjectId(card_id)})
 
         if Jwt.verify_user_permission(token, card['author.$id']) == UserType.NOT_ALLOWED_USER:
             return False
 
         self.database[self.collection].find_one_and_delete(
             {'_id': ObjectId(card_id)})
+        return True
+
+    def update_card(self, card_id, card, token):
+        if Jwt.verify_user_permission(token) == UserType.NOT_ALLOWED_USER:
+            logging.exception(
+                'Not permitted to update card with card id %s' % card['_id'])
+            return False
+
+        self.database[self.collection].find_one_and_update(
+            {'_id': ObjectId(card_id)}, {'$set': {'title': card['title'],
+                                                  'content': card['content'],
+                                                  'image': card['image'],
+                                                  'price': card['price'],
+                                                  'quantity': card['quantity']}}, return_document=ReturnDocument.AFTER)
         return True

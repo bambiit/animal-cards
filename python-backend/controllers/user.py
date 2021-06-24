@@ -9,7 +9,7 @@ class UserController:
         user_model = User()
         added_user = user_model.add(user)
         if added_user:
-            return jsonify(user=added_user)
+            return jsonify(code=200, user_id=added_user['_id'])
 
         return jsonify(code=400, message='Could not register new user')
 

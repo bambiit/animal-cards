@@ -3,7 +3,7 @@ from pymongo import MongoClient
 
 MONGO_DB_HOST = os.environ['MONGO_DB_HOST']
 MONGO_DB_PORT = os.environ['MONGO_DB_PORT']
-MONGO_DB_DATABASE = os.environ['MONGO_DB_DATABASE']
+MONGO_DB_DATABASE = os.environ['MONGO_INITDB_DATABASE']
 MONGO_DB_USERNAME = os.environ['MONGO_DB_USERNAME']
 MONGO_DB_PASSWORD = os.environ['MONGO_DB_PASSWORD']
 

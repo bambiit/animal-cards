@@ -10,4 +10,5 @@
 | 11.6.21 | 6.0  | (Backend) Login with returned token, delete, update, add new user                                              |
 | 21.6.21 | 4.0  | (Backend) Update project structure with routes on specified files, Add more routes and implementation for APIs |
 | 22.6.21 | 3.0  | (Backend) Update cards API, adjust users API exception handling                                                |
-|  total  | 26.0 |                                                                                                                |
+| 24.6.21 | 3.0  | (Backend) Configure to test environment and using first test with pytest                                       |
+|  total  | 29.0 |                                                                                                                |

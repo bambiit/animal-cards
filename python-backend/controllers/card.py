@@ -23,8 +23,16 @@ class CardController():
 
     def add_card(self, card, token):
         card = Card()
-        added_card = card.add(card, token)
+        added_card = card.add_card(card, token)
         if added_card:
-            return jsonify(code=200, card=added_card)
+            return jsonify(code=200, new_card_id=added_card['_id'])
 
         return jsonify(code=400, message='The new card has not been created')
+
+    def update_card(self, card_id, card, token):
+        card = Card()
+        updated_card = card.update_card(card_id, card, token)
+        if updated_card:
+            return jsonify(code=200, updated_card=updated_card)
+
+        return jsonify(code=400, message='The card has not been updated')
