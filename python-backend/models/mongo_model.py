@@ -1,14 +1,16 @@
 from services.mongo import Mongo
+import os
 
 
 class MongoModel:
 
     def __init__(self, collection):
         client = Mongo()
-        database = client.get_database()
+        self.database = client.get_database()
         self.collection = collection
 
-        # Aggregate for _id returns as string
-        self.database[self.collection].aggregate([
-            {'project': {'_id': {'$toString': '$_id'}}}
-        ])
+    def reset(self):
+        if os.environ['SERVICE_ENV'] == 'TESTING':    
+            self.database[self.collection].drop()
+            return True
+        return False

@@ -17,7 +17,7 @@ class CardController():
         card = Card()
         is_card_removed = card.remove_card(card_id, token)
         if is_card_removed:
-            return jsonify(code=200, message='Card has been removed')
+            return jsonify(code=204, message='Card has been removed')
 
         return jsonify(code=400, message='The operation has not been permitted')
 
@@ -25,7 +25,7 @@ class CardController():
         card = Card()
         added_card = card.add_card(card, token)
         if added_card:
-            return jsonify(code=200, new_card_id=added_card['_id'])
+            return jsonify(code=201, new_card_id=added_card['_id'])
 
         return jsonify(code=400, message='The new card has not been created')
 

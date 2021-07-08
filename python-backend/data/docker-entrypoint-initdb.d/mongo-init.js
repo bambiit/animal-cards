@@ -10,3 +10,4 @@ db.createUser({
 db.createCollection('users');
 
 print('###############End init mongo database###############')
+

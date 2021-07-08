@@ -7,21 +7,22 @@ class UserController:
 
     def register(self, user):
         user_model = User()
-        added_user = user_model.add(user)
-        if added_user:
-            return jsonify(code=200, user_id=added_user['_id'])
+        added_user_id = user_model.add(user)
+        if added_user_id:
+            return jsonify(code=201, user_id=added_user_id)
 
         return jsonify(code=400, message='Could not register new user')
 
-    def login(self, username, password):
+    def login(self, email, password):
         user_model = User()
-        user = user_model.find_with_username(username)
-        token = user_model.verify_password(user, password)
+        user = user_model.find_by_email(email)
+        if user is not None:
+            token = user_model.verify_password(user, password)
 
-        if token:
-            return jsonify(code=200, message="Login successfully", token=token)
+            if token:
+                return jsonify(code=200, message="Login successfully", token=token)
 
-        return jsonify(code=400, message='Username or password is invalid')
+        return jsonify(code=400, message='Email or password is invalid')
 
     def getAll(self, token):
         user_model = User()
@@ -36,13 +37,16 @@ class UserController:
         user_model = User()
         is_deleted = user_model.delete(user_id, token)
         if is_deleted:
-            return jsonify(code=200, message='The user has been removed successfully')
+            return jsonify(code=204, message='The user has been removed successfully')
         return jsonify(code=400, message='The user has not been removed, the operation is not permitted')
 
-    def change_password(self, user_id, token, new_password):
-        user_model = User()
-        is_password_changed = user_model.change_password(
-            user_id, token, new_password)
-        if is_password_changed:
-            return jsonify(code=200, message='The password has been changed successfully')
-        return jsonify(code=400, message='The password has not been changed, the operation is not permitted')
+    def change_password(self, user_id, token, old_password, new_password):
+        try:
+            user_model = User()
+            is_password_changed = user_model.change_password(
+                user_id, token, old_password, new_password)
+            if is_password_changed:
+                return jsonify(code=200, message='The password has been changed successfully')
+            return jsonify(code=400, message='The password has not been changed, the operation is not permitted')
+        except Exception as error:
+            return jsonify(code=400, message=str(error))

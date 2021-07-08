@@ -3,11 +3,14 @@ from flask import request, jsonify
 from controllers.user import UserController
 from controllers.card import CardController
 
+app.url_map.strict_slashes = False
+
 ####################Users API #######################
 
 
 def get_token():
-    return request.headers.get('Authorization')
+    data = request.headers.get('Authorization')
+    return str.replace(str(data), 'Bearer', '').strip()
 
 
 @app.route('/')
@@ -22,7 +25,7 @@ def get_users():
     return user_controller.getAll(token)
 
 
-@app.route('/api/users/register', methods=['PUT'])
+@app.route('/api/users/register/', methods=['PUT', 'POST'])
 def new_user():
     new_user = request.get_json()
     user_controller = UserController()
@@ -31,16 +34,16 @@ def new_user():
 
 @app.route('/api/users/login/', methods=['POST'])
 def login():
-    try:
+    if request.get_json() and 'email' in request.get_json() and 'password' in request.get_json():
         user_controller = UserController()
-        username = request.get_json()['username']
+        email = request.get_json()['email']
         password = request.get_json()['password']
-        return user_controller.login(username, password)
-    except KeyError as error:
-        return jsonify(code=400, message="Missing required information")
+        return user_controller.login(email, password)
+
+    return jsonify(code=400, message="Missing required information")
 
 
-@app.route('/api/users/<user_id>/delete/', methods=['DELETE'])
+@app.route('/api/users/<user_id>/delete/', methods=['DELETE', 'POST'])
 def delete_user(user_id):
     user_controller = UserController()
     token = get_token()
@@ -49,15 +52,14 @@ def delete_user(user_id):
 
 @app.route('/api/users/<user_id>/change_password/', methods=['POST'])
 def change_password(user_id):
-    try:
+    if request.get_json() and 'new_password' in request.get_json() and 'old_password' in request.get_json():
         user_controller = UserController()
         token = get_token()
         new_password = request.get_json()['new_password']
-        return user_controller.change_password(user_id, token, new_password)
+        old_password = request.get_json()['old_password']
+        return user_controller.change_password(user_id, token, old_password, new_password)
 
-    except KeyError as error:
-        return jsonify(code=400, message="Missing new password")
-
+    return jsonify(code=400, message="Missing new password")
 
 ####################Cards API #######################
 @app.route('/api/cards/', methods=['GET'])
@@ -73,14 +75,14 @@ def get_cards_by_author(author_id):
     return cards
 
 
-@app.route('/api/cards/<card_id>/delete/', methods=['DELETE'])
+@app.route('/api/cards/<card_id>/delete/', methods=['DELETE', 'POST'])
 def delete_card(card_id):
     token = get_token()
     card_controller = CardController()
     return card_controller.remove_card(card_id, token)
 
 
-@app.route('/api/cards/add/', methods=['PUT'])
+@app.route('/api/cards/add/', methods=['PUT', 'POST'])
 def add_card():
     token = get_token()
     new_card = request.get_json()

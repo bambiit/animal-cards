@@ -5,6 +5,9 @@ services:
       - ./configuration/.env
     environment: 
       MONGO_INITDB_DATABASE: ${MONGO_INITDB_DATABASE}
+      MONGO_DB_USERNAME: ${MONGO_DB_USERNAME}
+      MONGO_DB_PASSWORD: ${MONGO_DB_PASSWORD}
+      SERVICE_ENV: ${SERVICE_ENV}
     image: animal-cards-backend
     build:
       context: .
@@ -17,8 +20,8 @@ services:
       - 8080:8080
 
   animal-cards-mongodb:
-    image: mongo:3.6.18
-    restart: always
+    image: mongo:4.2-rc-bionic
+    # restart: always
     volumes:
       - ./data/docker-entrypoint-initdb.d/:/docker-entrypoint-initdb.d/:ro
     environment:
