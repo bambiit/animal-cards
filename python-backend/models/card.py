@@ -33,21 +33,21 @@ class Card(MongoModel):
             'content': card['content'],
             'image': card['image'],
             'price': card['price'],
+            'unit': card['unit'],
             'quantity': card['quantity']
         }
 
     def get_all(self):
         cards = self.database[self.collection].aggregate([
-            {'$project': {'_id': {'$toString': '$_id', 'author': 0}}},
+            {'$project': {'_id': {'$toString': '$_id'}}},
             {'$lookup':
                 {
                     'from': 'users',
-                    'localField': 'author',
-                    'foreignField': '_id',
+                    'as': 'author_info',
+                    'let': {'author': '$_id'},
                     'pipeline': [{
                         '$project': {'password': 0, 'role': 0, 'email': 0}
-                    }],
-                    'as': 'author_info'
+                    }]
                 }
              }
         ])
@@ -57,25 +57,36 @@ class Card(MongoModel):
         if not author_id:
             return get_all(self)
 
-        cards = self.database[self.collection].aggregate([
-            {'$match': {'author': ObjectId(author_id)}},
-            {'$project': {'_id': {'$toString': '$_id', 'author': 0}}}
-        ])
-        return cards
+        try:
+            cards = self.database[self.collection].aggregate([
+                {'$match': {'author': ObjectId(author_id)}},
+                {'$project': {'_id': {'$toString': '$_id'}}}
+            ])
+            return cards
+        except Exception as error:
+            logging.exception(error)
+            return None
 
     def remove_card(self, card_id, token):
         if not card_id:
             return False
 
-        card = self.database[self.collection].find_one(
-            {'_id': ObjectId(card_id)})
+        card_item = self.database[self.collection].aggregate([
+            {'$match': {'_id': ObjectId(card_id)}},
+            {'$limit': 1},
+            {'$project': {'author': {'$toString': '$author'}}}
+        ])
 
-        if Jwt.verify_user_permission(token, card['author.$id']) == UserType.NOT_ALLOWED_USER:
-            return False
+        if card_item is not None:
+            card = list(card_item)[0]
+            if Jwt.verify_user_permission(token, card['author']) ==     UserType.NOT_ALLOWED_USER:
+                return False
 
-        self.database[self.collection].find_one_and_delete(
-            {'_id': ObjectId(card_id)})
-        return True
+            self.database[self.collection].find_one_and_delete(
+                {'_id': ObjectId(card_id)})
+            return True
+            
+        return False
 
     def update_card(self, card_id, card, token):
         if Jwt.verify_user_permission(token) == UserType.NOT_ALLOWED_USER:
@@ -89,6 +100,7 @@ class Card(MongoModel):
                       'content': card['content'],
                       'image': card['image'],
                       'price': card['price'],
+                      'unit': card['unit'],
                       'quantity': card['quantity']}}, return_document=ReturnDocument.AFTER)
         return True
 

@@ -310,7 +310,7 @@ def test_remove_user_with_admin_user_successfully(client):
 def test_remove_user_with_normal_user(client):
     TestUtils.init_users()
 
-    admin_user_id, token = TestUtils.retrieve_token(
+    logged_in_user_id, token = TestUtils.retrieve_token(
         'minh.bui.user1@helsinki.fi', 'P@ssw0rd@User1')
 
     user_id = TestUtils.retrieve_user_id(

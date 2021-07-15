@@ -14,3 +14,10 @@ class MongoModel:
             self.database[self.collection].drop()
             return True
         return False
+
+    def count(self):
+        total = self.database[self.collection].aggregate([
+            {'$count': 'total'}
+        ])
+
+        return list(total)[0]

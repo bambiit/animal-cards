@@ -11,7 +11,9 @@ class CardController():
     def get_all_filtered_by_author(self, author_id):
         card = Card()
         cards = card.get_cards_by_author(author_id)
-        return jsonify(code=200, cards=list(cards))
+        if cards:
+            return jsonify(code=200, cards=list(cards))
+        return jsonify(code=400, message='no valid cards has been found for queried user')
 
     def remove_card(self, card_id, token):
         card = Card()

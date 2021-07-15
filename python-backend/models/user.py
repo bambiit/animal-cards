@@ -146,13 +146,6 @@ class User(MongoModel):
 
         return None
 
-    def count(self):
-        number_of_users = self.database[self.collection].aggregate([
-            {'$count': 'num_of_users'}
-        ])
-
-        return list(number_of_users)[0]
-
     def add_many(self, users):
         formatted_users = []
         for user in users:
