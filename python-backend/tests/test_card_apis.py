@@ -132,3 +132,158 @@ def test_delete_card_by_other_author(client):
     rv_data_json = json.loads(rv.data)
     assert 'code' in rv_data_json and rv_data_json['code'] == 400
     assert TestUtils.get_numbers_of_cards() == 3
+
+######################add new card API tests####################
+
+
+def test_add_new_card_successfully(client):
+
+    TestUtils.init_users()
+
+    # user 1 log in with normal user
+    logged_in_user_id, token = TestUtils.retrieve_token(
+        'minh.bui.user1@helsinki.fi', 'P@ssw0rd@User1')
+
+    payload = {
+        'title': 'Snow Leopard',
+        'content': 'This is a content for snow leopard card',
+        'image': 'https://wwf.fi/snow-leopard',
+        'price': '199.99',
+        'unit': 'EUR',
+        'quantity': '99'
+    }
+
+    rv = client.put('/api/cards/add/', json=payload,
+                    headers={'Authorization': 'Bearer %s' % token})
+    rv_data_json = json.loads(rv.data)
+    assert 'code' in rv_data_json and rv_data_json['code'] == 201
+    assert 'new_card_id' in rv_data_json
+    assert TestUtils.get_numbers_of_cards() == 1
+
+
+def test_add_new_card_without_login(client):
+
+    payload = {
+        'title': 'Snow Leopard',
+        'content': 'This is a content for snow leopard card',
+        'image': 'https://wwf.fi/snow-leopard',
+        'price': '199.99',
+        'unit': 'EUR',
+        'quantity': '99'
+    }
+
+    rv = client.put('/api/cards/add/', json=payload)
+    rv_data_json = json.loads(rv.data)
+    assert 'code' in rv_data_json and rv_data_json['code'] == 400
+    assert 'new_card_id' not in rv_data_json
+    assert TestUtils.get_numbers_of_cards() == 0
+
+
+def test_add_new_card_missing_required_information(client):
+
+    TestUtils.init_users()
+
+    # user 1 log in with normal user
+    logged_in_user_id, token = TestUtils.retrieve_token(
+        'minh.bui.user1@helsinki.fi', 'P@ssw0rd@User1')
+
+    payload = {
+        'content': 'This is a content for snow leopard card',
+        'image': 'https://wwf.fi/snow-leopard',
+        'price': '199.99',
+        'unit': 'EUR',
+        'quantity': '99'
+    }
+
+    rv = client.put('/api/cards/add/', json=payload,
+                    headers={'Authorization': 'Bearer %s' % token})
+    rv_data_json = json.loads(rv.data)
+    assert 'code' in rv_data_json and rv_data_json['code'] == 400
+    assert 'new_card_id' not in rv_data_json
+    assert TestUtils.get_numbers_of_cards() == 0
+
+######################update card API tests####################
+
+
+def test_update_card_by_author_successfully(client):
+    user_ids = TestUtils.init_users()
+    assert len(user_ids) >= 3
+
+    # user 1 in test data is normal user
+    author_id = TestUtils.retrieve_user_id('minh.bui.user1@helsinki.fi')
+    inserted_card_ids = TestUtils.init_cards_with_specific_author(author_id)
+    assert TestUtils.get_numbers_of_cards() == 3
+
+    # logged in with author user
+    logged_in_user_id, token = TestUtils.retrieve_token(
+        'minh.bui.user1@helsinki.fi', 'P@ssw0rd@User1')
+
+    payload = {
+        'content': 'This is an updated content',
+        'image': 'https://wwf.fi/update-url'
+    }
+
+    rv = client.post('/api/cards/%s/update/' % inserted_card_ids[0],
+                     json=payload,
+                     headers={'Authorization': 'Bearer %s' % token})
+
+    rv_data_json = json.loads(rv.data)
+    assert 'code' in rv_data_json and rv_data_json['code'] == 200
+    assert 'updated_card' in rv_data_json
+    assert 'content' in rv_data_json['updated_card'] and rv_data_json[
+        'updated_card']['content'] == 'This is an updated content'
+    assert 'image' in rv_data_json['updated_card'] and rv_data_json['updated_card']['image'] == 'https://wwf.fi/update-url'
+
+
+def test_update_card_by_admin(client):
+    user_ids = TestUtils.init_users()
+    assert len(user_ids) >= 3
+
+    # user 1 in test data is normal user
+    author_id = TestUtils.retrieve_user_id('minh.bui.user1@helsinki.fi')
+    inserted_card_ids = TestUtils.init_cards_with_specific_author(author_id)
+    assert TestUtils.get_numbers_of_cards() == 3
+
+    # logged in with admin user
+    logged_in_user_id, token = TestUtils.retrieve_token(
+        'minh.bui.admin@helsinki.fi', 'P@ssw0rd@Admin')
+
+    payload = {
+        'content': 'This is an updated content',
+        'image': 'https://wwf.fi/update-url'
+    }
+
+    rv = client.post('/api/cards/%s/update/' % inserted_card_ids[0],
+                     json=payload,
+                     headers={'Authorization': 'Bearer %s' % token})
+
+    rv_data_json = json.loads(rv.data)
+    assert 'code' in rv_data_json and rv_data_json['code'] == 400
+    assert 'updated_card' not in rv_data_json
+
+
+def test_update_card_by_other_user(client):
+    user_ids = TestUtils.init_users()
+    assert len(user_ids) >= 3
+
+    # user 1 in test data is normal user
+    author_id = TestUtils.retrieve_user_id('minh.bui.user1@helsinki.fi')
+    inserted_card_ids = TestUtils.init_cards_with_specific_author(author_id)
+    assert TestUtils.get_numbers_of_cards() == 3
+
+    # logged in with admin user
+    logged_in_user_id, token = TestUtils.retrieve_token(
+        'minh.bui.user2@helsinki.fi', 'P@ssw0rd@User2')
+
+    payload = {
+        'content': 'This is an updated content',
+        'image': 'https://wwf.fi/update-url'
+    }
+
+    rv = client.post('/api/cards/%s/update/' % inserted_card_ids[0],
+                     json=payload,
+                     headers={'Authorization': 'Bearer %s' % token})
+
+    rv_data_json = json.loads(rv.data)
+    assert 'code' in rv_data_json and rv_data_json['code'] == 400
+    assert 'updated_card' not in rv_data_json

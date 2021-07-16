@@ -9,8 +9,11 @@ app.url_map.strict_slashes = False
 
 
 def get_token():
-    data = request.headers.get('Authorization')
-    return str.replace(str(data), 'Bearer', '').strip()
+    authorization = request.headers.get('Authorization')
+    if authorization:
+        data = request.headers.get('Authorization')
+        return str.replace(str(data), 'Bearer', '').strip()
+    return None
 
 
 @app.route('/')

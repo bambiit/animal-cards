@@ -23,17 +23,18 @@ class CardController():
 
         return jsonify(code=400, message='The operation has not been permitted')
 
-    def add_card(self, card, token):
-        card = Card()
-        added_card = card.add_card(card, token)
-        if added_card:
-            return jsonify(code=201, new_card_id=added_card['_id'])
+    def add_card(self, new_card, token):
+        if token:
+            card_model = Card()
+            added_card_id = card_model.add_card(new_card, token)
+            if added_card_id:
+                return jsonify(code=201, new_card_id=added_card_id)
 
         return jsonify(code=400, message='The new card has not been created')
 
     def update_card(self, card_id, card, token):
-        card = Card()
-        updated_card = card.update_card(card_id, card, token)
+        card_model = Card()
+        updated_card = card_model.update_card(card_id, card, token)
         if updated_card:
             return jsonify(code=200, updated_card=updated_card)
 

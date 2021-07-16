@@ -87,7 +87,7 @@ class TestUtils():
     @classmethod
     def get_numbers_of_users(cls):
         user_model = User()
-        return user_model.count()['total']
+        return user_model.count()
 
     @classmethod
     def init_cards_with_random_authors(cls, user_ids=[]):
@@ -124,4 +124,4 @@ class TestUtils():
     @classmethod
     def get_numbers_of_cards(cls):
         card_model = Card()
-        return card_model.count()['total']
+        return card_model.count()
