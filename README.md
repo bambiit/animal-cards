@@ -12,4 +12,5 @@
 | 22.6.21 | 3.0  | (Backend) Update cards API, adjust users API exception handling                                                                      |
 | 24.6.21 | 3.0  | (Backend) Configure to test environment and using first test with pytest                                                             |
 | 08.7.21 | 10.0 | (Backend) Create bash script to run on different environments, add Card APIs methods, update User API methods and add User API tests |
+| 15.7.21 | 3.0  | (Backend) Create cards API tests                                                                                                     |
 |  total  | 39.0 |                                                                                                                                      |
