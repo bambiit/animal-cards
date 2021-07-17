@@ -65,6 +65,8 @@ def change_password(user_id):
     return jsonify(code=400, message="Missing new password")
 
 ####################Cards API #######################
+
+
 @app.route('/api/cards/', methods=['GET'])
 def get_cards():
     card_controller = CardController()
