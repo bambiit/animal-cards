@@ -117,7 +117,7 @@ def test_login_api_wrong_password(client):
 
 def fail_change_password_action(client, rv_change_password, email, new_password):
     rv_change_password_json = json.loads(rv_change_password.data)
-    assert rv_change_password_json['code'] == 400
+    assert 'code' in rv_change_password_json and rv_change_password_json['code'] == 400
 
     login_payload = {
         'email': email,
@@ -140,9 +140,9 @@ def test_change_password_successfully(client):
         'new_password': 'P@ssw0rd@User1-New'
     }
 
-    rv_change_password = client.post('/api/users/%s/change_password' % user_id,
-                                     json=change_password_payload,
-                                     headers={'Authorization': 'Bearer %s' % token})
+    rv_change_password = client.put('/api/users/%s/change_password' % user_id,
+                                    json=change_password_payload,
+                                    headers={'Authorization': 'Bearer %s' % token})
 
     rv_change_password_json = json.loads(rv_change_password.data)
     assert rv_change_password_json['code'] == 200
@@ -167,8 +167,8 @@ def test_change_password_without_authorization(client):
         'new_password': 'P@ssw0rd@User1-New'
     }
 
-    rv_change_password = client.post('/api/users/%s/change_password' % user_id,
-                                     json=change_password_payload)
+    rv_change_password = client.put('/api/users/%s/change_password' % user_id,
+                                    json=change_password_payload)
     fail_change_password_action(
         client, rv_change_password, 'minh.bui.user1@helsinki.fi', 'P@ssw0rd@User1-New')
 
@@ -178,8 +178,8 @@ def test_change_password_without_payload(client):
     user_id, token = TestUtils.retrieve_token(
         'minh.bui.user1@helsinki.fi', 'P@ssw0rd@User1')
 
-    rv_change_password = client.post('/api/users/%s/change_password' % user_id,
-                                     headers={'Authorization': 'Bearer %s' % token})
+    rv_change_password = client.put('/api/users/%s/change_password' % user_id,
+                                    headers={'Authorization': 'Bearer %s' % token})
 
     fail_change_password_action(
         client, rv_change_password, 'minh.bui.user1@helsinki.fi', 'P@ssw0rd@User1-New')
@@ -195,9 +195,9 @@ def test_change_password_wrong_old_password(client):
         'new_password': 'P@ssw0rd@User1-New'
     }
 
-    rv_change_password = client.post('/api/users/%s/change_password' % user_id,
-                                     json=change_password_payload,
-                                     headers={'Authorization': 'Bearer %s' % token})
+    rv_change_password = client.put('/api/users/%s/change_password' % user_id,
+                                    json=change_password_payload,
+                                    headers={'Authorization': 'Bearer %s' % token})
 
     fail_change_password_action(
         client, rv_change_password, 'minh.bui.user1@helsinki.fi', 'P@ssw0rd@User1-New')
@@ -220,9 +220,9 @@ def test_change_password_unauthenticated_user_id(client):
     }
 
     # change password of user 1 with token of logged in user 2
-    rv_change_password = client.post('/api/users/%s/change_password' % user_id,
-                                     json=change_password_payload,
-                                     headers={'Authorization': 'Bearer %s' % token})
+    rv_change_password = client.put('/api/users/%s/change_password' % user_id,
+                                    json=change_password_payload,
+                                    headers={'Authorization': 'Bearer %s' % token})
 
     fail_change_password_action(
         client, rv_change_password, 'minh.bui.user1@helsinki.fi', 'P@ssw0rd@User1-New')
@@ -245,9 +245,9 @@ def test_change_password_with_admin_user(client):
     }
 
     # change password of user 1 with token of logged in user 2
-    rv_change_password = client.post('/api/users/%s/change_password' % user_id,
-                                     json=change_password_payload,
-                                     headers={'Authorization': 'Bearer %s' % token})
+    rv_change_password = client.put('/api/users/%s/change_password' % user_id,
+                                    json=change_password_payload,
+                                    headers={'Authorization': 'Bearer %s' % token})
 
     fail_change_password_action(
         client, rv_change_password, 'minh.bui.user1@helsinki.fi', 'P@ssw0rd@User1-New')
@@ -297,8 +297,8 @@ def test_remove_user_with_admin_user_successfully(client):
     user_id = TestUtils.retrieve_user_id(
         'minh.bui.user1@helsinki.fi')
 
-    rv = client.post('/api/users/%s/delete' % user_id,
-                     headers={'Authorization': 'Bearer %s' % token})
+    rv = client.delete('/api/users/%s/delete' % user_id,
+                       headers={'Authorization': 'Bearer %s' % token})
 
     rv_json_data = json.loads(rv.data)
     assert 'code' in rv_json_data and rv_json_data['code'] == 204
@@ -316,8 +316,8 @@ def test_remove_user_with_normal_user(client):
     user_id = TestUtils.retrieve_user_id(
         'minh.bui.user2@helsinki.fi')
 
-    rv = client.post('/api/users/%s/delete' % user_id,
-                     headers={'Authorization': 'Bearer %s' % token})
+    rv = client.delete('/api/users/%s/delete' % user_id,
+                       headers={'Authorization': 'Bearer %s' % token})
 
     rv_json_data = json.loads(rv.data)
     assert 'code' in rv_json_data and rv_json_data['code'] == 400

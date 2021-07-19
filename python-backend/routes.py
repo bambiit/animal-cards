@@ -28,7 +28,7 @@ def get_users():
     return user_controller.getAll(token)
 
 
-@app.route('/api/users/register/', methods=['PUT', 'POST'])
+@app.route('/api/users/register/', methods=['POST'])
 def new_user():
     new_user = request.get_json()
     user_controller = UserController()
@@ -46,14 +46,14 @@ def login():
     return jsonify(code=400, message="Missing required information")
 
 
-@app.route('/api/users/<user_id>/delete/', methods=['DELETE', 'POST'])
+@app.route('/api/users/<user_id>/delete/', methods=['DELETE'])
 def delete_user(user_id):
     user_controller = UserController()
     token = get_token()
     return user_controller.delete(user_id, token)
 
 
-@app.route('/api/users/<user_id>/change_password/', methods=['POST'])
+@app.route('/api/users/<user_id>/change_password/', methods=['PUT'])
 def change_password(user_id):
     if request.get_json() and 'new_password' in request.get_json() and 'old_password' in request.get_json():
         user_controller = UserController()
@@ -80,14 +80,14 @@ def get_cards_by_author(author_id):
     return cards
 
 
-@app.route('/api/cards/<card_id>/delete/', methods=['DELETE', 'POST'])
+@app.route('/api/cards/<card_id>/delete/', methods=['DELETE'])
 def delete_card(card_id):
     token = get_token()
     card_controller = CardController()
     return card_controller.remove_card(card_id, token)
 
 
-@app.route('/api/cards/add/', methods=['PUT', 'POST'])
+@app.route('/api/cards/add/', methods=['POST'])
 def add_card():
     token = get_token()
     new_card = request.get_json()
@@ -95,7 +95,7 @@ def add_card():
     return card_controller.add_card(new_card, token)
 
 
-@app.route('/api/cards/<card_id>/update/', methods=['POST'])
+@app.route('/api/cards/<card_id>/update/', methods=['PUT'])
 def update_card(card_id):
     token = get_token()
     update_card = request.get_json()

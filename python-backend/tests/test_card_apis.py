@@ -153,7 +153,7 @@ def test_add_new_card_successfully(client):
         'quantity': '99'
     }
 
-    rv = client.put('/api/cards/add/', json=payload,
+    rv = client.post('/api/cards/add/', json=payload,
                     headers={'Authorization': 'Bearer %s' % token})
     rv_data_json = json.loads(rv.data)
     assert 'code' in rv_data_json and rv_data_json['code'] == 201
@@ -172,7 +172,7 @@ def test_add_new_card_without_login(client):
         'quantity': '99'
     }
 
-    rv = client.put('/api/cards/add/', json=payload)
+    rv = client.post('/api/cards/add/', json=payload)
     rv_data_json = json.loads(rv.data)
     assert 'code' in rv_data_json and rv_data_json['code'] == 400
     assert 'new_card_id' not in rv_data_json
@@ -195,7 +195,7 @@ def test_add_new_card_missing_required_information(client):
         'quantity': '99'
     }
 
-    rv = client.put('/api/cards/add/', json=payload,
+    rv = client.post('/api/cards/add/', json=payload,
                     headers={'Authorization': 'Bearer %s' % token})
     rv_data_json = json.loads(rv.data)
     assert 'code' in rv_data_json and rv_data_json['code'] == 400
@@ -223,7 +223,7 @@ def test_update_card_by_author_successfully(client):
         'image': 'https://wwf.fi/update-url'
     }
 
-    rv = client.post('/api/cards/%s/update/' % inserted_card_ids[0],
+    rv = client.put('/api/cards/%s/update/' % inserted_card_ids[0],
                      json=payload,
                      headers={'Authorization': 'Bearer %s' % token})
 
@@ -253,7 +253,7 @@ def test_update_card_by_admin(client):
         'image': 'https://wwf.fi/update-url'
     }
 
-    rv = client.post('/api/cards/%s/update/' % inserted_card_ids[0],
+    rv = client.put('/api/cards/%s/update/' % inserted_card_ids[0],
                      json=payload,
                      headers={'Authorization': 'Bearer %s' % token})
 
@@ -280,7 +280,7 @@ def test_update_card_by_other_user(client):
         'image': 'https://wwf.fi/update-url'
     }
 
-    rv = client.post('/api/cards/%s/update/' % inserted_card_ids[0],
+    rv = client.put('/api/cards/%s/update/' % inserted_card_ids[0],
                      json=payload,
                      headers={'Authorization': 'Bearer %s' % token})
 
